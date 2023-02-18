@@ -113,36 +113,34 @@ const Game: React.FC = () => {
   return (
     <div>
     <h1>Sokoban Game</h1>
-    <div style={{ display: 'flex', flexDirection: 'column' }} >
-      <div style={{ display: 'flex' }}>
-        {[...Array(gameState.width)].map((_, colIndex) => (
-          <Cell key={`wall-top-${colIndex}`} isWall />
-        ))}
-      </div>
+    <div style={{ display: "flex", flexDirection: "column" }}>
       {[...Array(gameState.height)].map((_, rowIndex) => (
-        <div key={`row-${rowIndex}`} style={{ display: 'flex' }}>
-          <Cell isWall />
+        <div key={`row-${rowIndex}`} style={{ display: "flex" }}>
           {[...Array(gameState.width)].map((_, colIndex) => {
-            const isPlayer = gameState.playerPosition[0] === rowIndex && gameState.playerPosition[1] === colIndex;
-            const isBox = gameState.boxes.some((boxPos) => boxPos[0] === rowIndex && boxPos[1] === colIndex);
-            const isGoal = gameState.targets.some((targetPos) => targetPos[0] === rowIndex && targetPos[1] === colIndex);
+            const isWall = gameState.walls.some(
+              (wallPos) => wallPos[0] === rowIndex && wallPos[1] === colIndex
+            );
+            const isPlayer =
+              gameState.playerPosition[0] === rowIndex &&
+              gameState.playerPosition[1] === colIndex;
+            const isBox = gameState.boxes.some(
+              (boxPos) => boxPos[0] === rowIndex && boxPos[1] === colIndex
+            );
+            const isGoal = gameState.targets.some(
+              (targetPos) => targetPos[0] === rowIndex && targetPos[1] === colIndex
+            );
             return (
               <Cell
-                key={`cell-${rowIndex}-${colIndex}`}
+                key={`${rowIndex}-${colIndex}`}
+                isWall={isWall}
                 isPlayer={isPlayer}
                 isBox={isBox}
-                isTarget={isGoal}
+                isGoal={isGoal}
               />
             );
           })}
-          <Cell isWall />
         </div>
       ))}
-      <div style={{ display: 'flex' }}>
-        {[...Array(gameState.width)].map((_, colIndex) => (
-          <Cell key={`wall-bottom-${colIndex}`} isWall />
-        ))}
-      </div>
     </div>
   </div>
   );
@@ -155,10 +153,10 @@ type CellProps = {
   isWall?: boolean;
   isPlayer?: boolean;
   isBox?: boolean;
-  isTarget?: boolean;
+  isGoal?: boolean;
 };
 
-const Cell: React.FC<CellProps> = ({ isWall, isPlayer, isBox, isTarget }) => {
+const Cell: React.FC<CellProps> = ({ isWall, isPlayer, isBox, isGoal }) => {
   let backgroundColor;
   let content;
 
@@ -171,7 +169,7 @@ const Cell: React.FC<CellProps> = ({ isWall, isPlayer, isBox, isTarget }) => {
   } else if (isBox) {
     backgroundColor = 'brown';
     content = 'B';
-  } else if (isTarget) {
+  } else if (isGoal) {
     backgroundColor = 'green';
     content = 'T';
   } else {

@@ -15,13 +15,6 @@ type GameState = {
     height: 5,
     boxes: [
       [2, 2],
-      [2, 3],
-      [2, 4],
-      [3, 2],
-      [3, 4],
-      [4, 2],
-      [4, 3],
-      [4, 4],
     ],
     walls: [
       [0, 0],
@@ -42,14 +35,7 @@ type GameState = {
       [4, 4],
     ],
     targets: [
-      [1, 2],
       [1, 3],
-      [1, 4],
-      [3, 1],
-      [3, 3],
-      [5, 2],
-      [5, 3],
-      [5, 4],
     ],
   };
 
@@ -102,6 +88,16 @@ const Game: React.FC = () => {
           boxes: newBoxes,
         }));
       }
+
+      function isGameWon(): boolean {
+        return gameState.boxes.every((boxPos) =>
+          gameState.targets.some((targetPos) => targetPos[0] === boxPos[0] && targetPos[1] === boxPos[1])
+        );
+      }
+
+      function handlePlayAgain() {
+        setGameState(initialGameState);
+      }
       
       useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
@@ -142,6 +138,7 @@ const Game: React.FC = () => {
         </div>
       ))}
     </div>
+    {isGameWon() && ( <> <h2>You win!</h2> <button onClick={handlePlayAgain}>Play Again</button> </>)}
   </div>
   );
 };

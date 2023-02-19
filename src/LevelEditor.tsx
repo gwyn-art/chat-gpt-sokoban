@@ -87,13 +87,13 @@ export const LevelEditor: React.FC<{ onSave(): void, level?: Level }> = ({ onSav
     const handleEmptyClick = (x: number, y: number) => {
       setGameState(prevState => {
         const walls = prevState.walls.filter(
-          wall => wall[0] !== x && wall[1] !== y
+          wall => wall[0] !== x || wall[1] !== y
         );
         const targets = prevState.targets.filter(
-          target => target[0] !== x && target[1] !== y
+          target => target[0] !== x || target[1] !== y
         );
         const boxes = prevState.boxes.filter(
-          box => box[0] !== x && box[1] !== y
+          box => box[0] !== x || box[1] !== y
         );
         const playerPosition =
           prevState.playerPosition[0] === x && prevState.playerPosition[1] === y

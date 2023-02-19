@@ -4,9 +4,10 @@ import { LEVELS_STORE_KEY, Level, loadLevels } from './LevelEditor';
 
 type LevelListProps = {
     handlePlay: (levels: Level[]) => void;
+    handleEdit: (levels: Level) => void;
 }
 
-export const LevelList: React.FC<LevelListProps> = ({ handlePlay }) => {
+export const LevelList: React.FC<LevelListProps> = ({ handlePlay, handleEdit }) => {
     const [levels, setLevels] = useState<Level[]>([]);
   
     useEffect(() => {
@@ -44,6 +45,7 @@ export const LevelList: React.FC<LevelListProps> = ({ handlePlay }) => {
               <td>{level.name}</td>
               <td>
                 <button onClick={() => handlePlay([level])}>Play</button>
+                <button onClick={() => handleEdit(level)}>Edit</button>
                 <button onClick={() => handleDelete(index)}>Delete</button>
               </td>
             </tr>

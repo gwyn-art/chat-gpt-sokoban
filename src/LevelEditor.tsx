@@ -41,17 +41,22 @@ export const saveLevel = (levelName: string, level: GameState) => {
   }
 };
 
-export const LevelEditor: React.FC<{ onSave(): void }> = ({ onSave }) => {
-  const [levelName, setLevelName] = useState("");
-  const [selectedType, setSelectedType] = useState<SquareType>("empty");
-  const [gameState, setGameState] = useState<GameState>({
+const defaultLevel = {
+  name: '',
+  level: {
     playerPosition: [0, 0],
     boxes: [],
     walls: [],
     targets: [],
     width: 5,
     height: 5
-  });
+  }
+} as Level;
+
+export const LevelEditor: React.FC<{ onSave(): void, level?: Level }> = ({ onSave, level = defaultLevel }) => {
+  const [levelName, setLevelName] = useState(level.name);
+  const [selectedType, setSelectedType] = useState<SquareType>("empty");
+  const [gameState, setGameState] = useState<GameState>(level.level);
 
   const handleSquareClick = (x: number, y: number) => {
     const handlePlayerClick = (x: number, y: number) => {

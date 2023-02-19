@@ -1,15 +1,26 @@
-import React from 'react'
+import React, { TouchEventHandler } from "react";
 import { GameState } from "./types";
-import { Cell } from './Cell';
+import { Cell } from "./Cell";
 
 type GameFieldProps = {
-    gameState: GameState;
-    onCellClick?: (rowIndex: number, colIndex: number) => void;
-}
+  gameState: GameState;
+  onCellClick?: (rowIndex: number, colIndex: number) => void;
+  onTouchStart?: TouchEventHandler<HTMLDivElement>;
+  onTouchMove?: TouchEventHandler<HTMLDivElement>;
+};
 
-export const GameField: React.FC<GameFieldProps> = ({ gameState, onCellClick }) => {
+export const GameField: React.FC<GameFieldProps> = ({
+  gameState,
+  onCellClick,
+  onTouchMove,
+  onTouchStart
+}) => {
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
+    <div
+      style={{ display: "flex", flexDirection: "column", touchAction: "none" }}
+      onTouchMove={onTouchMove}
+      onTouchStart={onTouchStart}
+    >
       {[...Array(gameState.height)].map((_, rowIndex) => (
         <div key={`row-${rowIndex}`} style={{ display: "flex" }}>
           {[...Array(gameState.width)].map((_, colIndex) => {
@@ -33,7 +44,11 @@ export const GameField: React.FC<GameFieldProps> = ({ gameState, onCellClick }) 
                 isPlayer={isPlayer}
                 isBox={isBox}
                 isGoal={isGoal}
-                onClick={onCellClick ? () => onCellClick(rowIndex, colIndex) : undefined}
+                onClick={
+                  onCellClick
+                    ? () => onCellClick(rowIndex, colIndex)
+                    : undefined
+                }
               />
             );
           })}

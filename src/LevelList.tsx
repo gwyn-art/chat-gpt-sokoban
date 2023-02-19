@@ -3,7 +3,7 @@ import { LEVELS_STORE_KEY, Level, loadLevels } from './LevelEditor';
 
 
 type LevelListProps = {
-    handlePlay: (level: Level) => void;
+    handlePlay: (levels: Level[]) => void;
 }
 
 export const LevelList: React.FC<LevelListProps> = ({ handlePlay }) => {
@@ -24,6 +24,12 @@ export const LevelList: React.FC<LevelListProps> = ({ handlePlay }) => {
     };
   
     return (
+      <div>
+        <button
+          onClick={() => handlePlay(levels)}
+        >
+          Play all
+        </button>
       <table>
         <thead>
           <tr>
@@ -37,12 +43,13 @@ export const LevelList: React.FC<LevelListProps> = ({ handlePlay }) => {
             <tr key={index}>
               <td>{level.name}</td>
               <td>
-                <button onClick={() => handlePlay(level)}>Play</button>
+                <button onClick={() => handlePlay([level])}>Play</button>
                 <button onClick={() => handleDelete(index)}>Delete</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      </div>
     );
   };

@@ -41,7 +41,7 @@ export const saveLevel = (levelName: string, level: GameState) => {
   }
 };
 
-export const LevelEditor = () => {
+export const LevelEditor: React.FC<{ onSave(): void }> = ({ onSave }) => {
   const [levelName, setLevelName] = useState("");
   const [selectedType, setSelectedType] = useState<SquareType>("empty");
   const [gameState, setGameState] = useState<GameState>({
@@ -141,6 +141,10 @@ export const LevelEditor = () => {
   const handleSave = () => {
     if (levelName) {
       saveLevel(levelName, gameState);
+      onSave()
+    }
+    else {
+      alert('Please enter a level name')
     }
   };
 

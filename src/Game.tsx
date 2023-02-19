@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { GameState } from "./types";
-import { levels } from "./levels";
+import { defaultLevels } from "./levels";
 import { Helper } from "./Helper";
 import { GameField } from "./GameField";
 
 const FIRST_LEVEL = 0;
-const Game: React.FC = () => {
-  const [gameState, setGameState] = useState(levels[FIRST_LEVEL]);
-  const [history, setHistory] = useState<GameState[]>([levels[FIRST_LEVEL]]);
-  const [currentLevel, setCurrentLevel] = useState(FIRST_LEVEL);
+
+type GameProps = {
+  levels?: GameState[];
+  firstLevel?: number;
+};
+
+const Game: React.FC<GameProps> = ({ levels = defaultLevels, firstLevel = FIRST_LEVEL }) => {
+  const [gameState, setGameState] = useState(levels[firstLevel]);
+  const [history, setHistory] = useState<GameState[]>([levels[firstLevel]]);
+  const [currentLevel, setCurrentLevel] = useState(firstLevel);
 
   const handleUndo = () => {
     if (history.length > 1) {
@@ -135,9 +141,9 @@ const Game: React.FC = () => {
 
   function handlePlayAgain() {
     if (isGameWon()) {
-      setCurrentLevel(FIRST_LEVEL);
-      setHistory([levels[FIRST_LEVEL]]);
-      setGameState(levels[FIRST_LEVEL]);
+      setCurrentLevel(firstLevel);
+      setHistory([levels[firstLevel]]);
+      setGameState(levels[firstLevel]);
     } else {
       setHistory([...history, gameState]);
       setGameState(levels[currentLevel]);

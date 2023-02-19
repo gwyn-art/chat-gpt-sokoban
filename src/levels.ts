@@ -124,4 +124,4 @@ export const level5: GameState = {
     height: 9
   }
 
-export const levels = [level1, level2, level3, level4, level5];
+export const defaultLevels = [level1, level2, level3, level4, level5];

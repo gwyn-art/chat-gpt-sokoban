@@ -1,7 +1,7 @@
 import React from "react";
 import { BoxIcon, GoalIcon, PlayerIcon } from "./Cell";
 
-const HelperIcon: React.FC<{ children: JSX.Element }> = ({ children }) => (
+const HelperIcon: React.FC<{ children: JSX.Element | string }> = ({ children }) => (
   <div style={{ display: "inline-block", width: "15px", height: "15px" }}>
     {children}
   </div>

@@ -316,6 +316,11 @@ export const getNextPosition = (
   }
 };
 
+const isOutOfBounds = (state: GameState, position: Position): boolean => {
+  const [x, y] = position;
+  return x < 0 || x >= state.height || y < 0 || y >= state.width;
+};
+
 /**
  * Moves all items on a cell in direction if it is movable and not blocked by stopper on next cell.
  * Recursively moves items on following cells following the same rules.
@@ -331,6 +336,10 @@ export const moveItems = (
   const nextItems = getItemsByPosition(state, nextPosition);
   const stopper = nextItems.find(i => isStopper(i));
   const movableItems = items.filter(i => isMovable(i));
+
+  if (isOutOfBounds(state, nextPosition) || stopper) {
+    throw new Error("Invalid move");
+  }
 
   if (stopper || movableItems.length === 0) {
     return state;
@@ -386,27 +395,31 @@ const moveSinglePlayer = (
   const movableItems = nextItems.filter(i => isMovable(i));
   const slippery = nextItems.find(i => isSlippery(i));
 
-  if (stopper) {
+  try {
+    if (stopper || isOutOfBounds(state, nextPosition)) {
+      return state;
+    }
+
+    let newState = state;
+
+    if (movableItems.length > 0) {
+      newState = moveItems(state, nextPosition, direction);
+    }
+
+    if (slippery) {
+      newState = updateItem(state, { ...player, position: nextPosition });
+      const newPlayer = getItem(newState, player.id);
+      if (newPlayer) {
+        return moveSinglePlayer(newState, newPlayer, direction);
+      } else {
+        return newState;
+      }
+    }
+
+    return updateItem(newState, { ...player, position: nextPosition });
+  } catch (e) {
     return state;
   }
-
-  let newState = state;
-
-  if (movableItems.length > 0) {
-    newState = moveItems(state, nextPosition, direction);
-  }
-
-  if (slippery) {
-    newState = updateItem(state, { ...player, position: nextPosition });
-    const newPlayer = getItem(newState, player.id);
-    if (newPlayer) {
-      return moveSinglePlayer(newState, newPlayer, direction);
-    } else {
-      return newState;
-    }
-  }
-
-  return updateItem(newState, { ...player, position: nextPosition });
 };
 
 /**

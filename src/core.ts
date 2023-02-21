@@ -336,22 +336,36 @@ export const moveItems = (
     return state;
   }
 
-  const slippery = items.find(i => isSlippery(i));
+  let newState = state;
+  
+  if (nextItems.some(isMovable)) {
+    newState = moveItems(newState, nextPosition, direction);
+  }
+  
+  newState = movableItems.reduce(
+    (s, i) => updateItem(s, { ...i, position: nextPosition }),
+    newState
+    );
+    
+    
+  const slippery = nextItems.find(i => isSlippery(i));
+
   if (slippery) {
     return moveItems(state, nextPosition, direction);
   }
 
-  const newState = movableItems.reduce(
-    (s, i) => updateItem(s, { ...i, position: nextPosition }),
-    state
-  );
-
-  if (nextItems.some(isMovable)) {
-    return moveItems(newState, nextPosition, direction);
-  }
-
   return newState;
 };
+
+export const movePlayer = (
+  state: GameState,
+  direction: Direction
+): GameState => {
+  return getItemsByPropertyType(state, PropertyType.Player).reduce(
+    (s, i) => moveSinglePlayer(s, i, direction),
+    state
+  );
+}
 
 /**
  * Moves the player in direction if it is not blocked by stopper on next cell.
@@ -362,11 +376,11 @@ export const moveItems = (
  * @param direction
  * @returns
  */
-export const movePlayer = (
+const moveSinglePlayer = (
   state: GameState,
+  player: Item,
   direction: Direction
 ): GameState => {
-  const player = getItemsByPropertyType(state, PropertyType.Player)[0];
   const nextPosition = getNextPosition(player.position, direction);
   const nextItems = getItemsByPosition(state, nextPosition);
   const stopper = nextItems.find(i => isStopper(i));

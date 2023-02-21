@@ -26,7 +26,7 @@ const Game: React.FC<GameProps> = ({
       const newHistory = [...history];
       const prevGameState = newHistory.pop();
       setHistory(newHistory);
-      if (prevGameState) setGameState(prevGameState);
+      if (prevGameState) setGameState({...prevGameState});
     }
   };
 
@@ -46,7 +46,7 @@ const Game: React.FC<GameProps> = ({
 
   const makeMove = (direction: Direction) => {
     const newGameState = movePlayer(gameState, direction)
-    setHistory([...history, newGameState]);
+    setHistory(prevHistory => ([...prevHistory, gameState ]));
     setGameState(newGameState);
   }
 

@@ -169,6 +169,7 @@ export const createPlayer = (position: Position): Item =>
     properties: [
       createProperty(PropertyType.Player),
       createProperty(PropertyType.Movable),
+      createProperty(PropertyType.Flammable),
       createProperty(PropertyType.Pusher)
     ]
   });

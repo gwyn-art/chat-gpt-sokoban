@@ -337,21 +337,20 @@ export const moveItems = (
   }
 
   let newState = state;
-  
+
   if (nextItems.some(isMovable)) {
     newState = moveItems(newState, nextPosition, direction);
   }
-  
+
   newState = movableItems.reduce(
     (s, i) => updateItem(s, { ...i, position: nextPosition }),
     newState
-    );
-    
-    
+  );
+
   const slippery = nextItems.find(i => isSlippery(i));
 
   if (slippery) {
-    return moveItems(state, nextPosition, direction);
+    return moveItems(newState, nextPosition, direction);
   }
 
   return newState;
@@ -365,7 +364,7 @@ export const movePlayer = (
     (s, i) => moveSinglePlayer(s, i, direction),
     state
   );
-}
+};
 
 /**
  * Moves the player in direction if it is not blocked by stopper on next cell.
@@ -391,17 +390,23 @@ const moveSinglePlayer = (
     return state;
   }
 
-  if (slippery) {
-    const newState = moveItems(state, nextPosition, direction);
-    return movePlayer(newState, direction);
-  }
+  let newState = state;
 
   if (movableItems.length > 0) {
-    const newState = moveItems(state, nextPosition, direction);
-    return updateItem(newState, { ...player, position: nextPosition });
+    newState = moveItems(state, nextPosition, direction);
   }
 
-  return updateItem(state, { ...player, position: nextPosition });
+  if (slippery) {
+    newState = updateItem(state, { ...player, position: nextPosition });
+    const newPlayer = getItem(newState, player.id);
+    if (newPlayer) {
+      return moveSinglePlayer(newState, newPlayer, direction);
+    } else {
+      return newState;
+    }
+  }
+
+  return updateItem(newState, { ...player, position: nextPosition });
 };
 
 /**

@@ -29,7 +29,7 @@ export const useTouchControls = (onMove: (direction: Direction) => void) => {
       // vertical swipe
       if (deltaY > 0) {
         // swipe down
-        onMove(Direction.Up)
+        onMove(Direction.Down)
       } else {
         // swipe up
         onMove(Direction.Up);

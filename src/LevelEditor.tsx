@@ -1,36 +1,109 @@
 import React, { useState } from "react";
-import { GameState } from "./types";
+import {
+  GameState,
+  PersistedGameState,
+  addItem,
+  createBox,
+  createFlag,
+  createItems,
+  createPlayer,
+  createWall,
+  removeItem,
+  removeItemsOnPosition
+} from "./core";
 import { GameField } from "./GameField";
 import SquareTypeSelector, { SquareType } from "./SquareTypeSelector";
+
+export const ACTUAL_VERSION = "1.0.0";
+
+export const MINIMAL_SUPPORTED_VERSION = "1.0.0";
 
 export type Level = {
   name: string;
   level: GameState;
+  version: string;
+};
+
+export type PersistLevel = Omit<Level, "level"> & {
+  level: PersistedGameState;
+};
+
+export type LevelToCreate = Omit<Level, "version">;
+
+function compareVersions(version1: string, version2: string): number {
+  const [major1, minor1, patch1] = version1.split(".").map(Number);
+  const [major2, minor2, patch2] = version2.split(".").map(Number);
+
+  if (major1 !== major2) {
+    return major1 > major2 ? 1 : -1;
+  }
+
+  if (minor1 !== minor2) {
+    return minor1 > minor2 ? 1 : -1;
+  }
+
+  if (patch1 !== patch2) {
+    return patch1 > patch2 ? 1 : -1;
+  }
+
+  return 0;
+}
+
+/**
+ * Checks level against minimal supported version.
+ * @param level
+ */
+export const isLevelValid = (level: Level) => {
+  if (compareVersions(level.version || "", MINIMAL_SUPPORTED_VERSION) < 0) {
+    return false;
+  }
+
+  return true;
+};
+
+export const createLevel = (level: LevelToCreate) => {
+  return {
+    ...level,
+    version: ACTUAL_VERSION
+  };
 };
 
 export const LEVELS_STORE_KEY = "levels";
 
-export const loadLevels = () => {
-    try {
-        const levels = JSON.parse(
-            localStorage.getItem(LEVELS_STORE_KEY) || "[]"
-        ) as Level[];
-        return levels;
-    } catch (error) {
-        // @ts-ignore
-        alert(`Error while loading levels: ${error.message}`);
-        return [];
-    }
+export const loadLevels = (): Level[] => {
+  try {
+    const levels = JSON.parse(
+      localStorage.getItem(LEVELS_STORE_KEY) || "[]"
+    ) as PersistLevel[];
+    return levels.map(level => ({
+      ...level,
+      level: {
+        ...level.level,
+        items: createItems(level.level.items).reduce(
+          (items, item) => items.set(item.id, item),
+          new Map()
+        )
+      }
+    }));
+  } catch (error) {
+    // @ts-ignore
+    alert(`Error while loading levels: ${error.message}`);
+    return [];
+  }
 };
 
 export const saveLevel = (levelName: string, level: GameState) => {
   try {
     const levels = JSON.parse(
       localStorage.getItem(LEVELS_STORE_KEY) || "[]"
-    ) as Level[];
+    ) as PersistLevel[];
     const newLevel = {
       name: levelName,
-      level
+      version: ACTUAL_VERSION,
+      level: {
+        ...level,
+        items: Array.from(level.items.values())
+      }
     };
     levels.push(newLevel);
     localStorage.setItem("levels", JSON.stringify(levels));
@@ -42,64 +115,58 @@ export const saveLevel = (levelName: string, level: GameState) => {
 };
 
 const defaultLevel = {
-  name: '',
+  name: "",
   level: {
-    playerPosition: [0, 0],
-    boxes: [],
-    walls: [],
-    targets: [],
+    items: new Map(),
     width: 5,
     height: 5
   }
 } as Level;
 
-export const LevelEditor: React.FC<{ onSave(): void, level?: Level }> = ({ onSave, level = defaultLevel }) => {
+export const LevelEditor: React.FC<{ onSave(): void; level?: Level }> = ({
+  onSave,
+  level = defaultLevel
+}) => {
   const [levelName, setLevelName] = useState(level.name);
   const [selectedType, setSelectedType] = useState<SquareType>("empty");
   const [gameState, setGameState] = useState<GameState>(level.level);
+  console.log(
+    "🚀 ~ file: LevelEditor.tsx:113 ~ constLevelEditor:React.FC<{onSave ~ gameState",
+    gameState
+  );
 
   const handleSquareClick = (x: number, y: number) => {
     const handlePlayerClick = (x: number, y: number) => {
-      setGameState(prevState => ({ ...prevState, playerPosition: [x, y] }));
+      setGameState(prevState => {
+        const newPlayer = createPlayer([x, y]);
+        return addItem(prevState, newPlayer);
+      });
     };
 
     const handleBoxClick = (x: number, y: number) => {
       setGameState(prevState => {
-        const boxes = [...prevState.boxes, [x, y] as [number, number]];
-        return { ...prevState, boxes };
+        const newBox = createBox([x, y]);
+        return addItem(prevState, newBox);
       });
     };
 
-    const handleTargetClick = (x: number, y: number) => {
+    const handleFlagClick = (x: number, y: number) => {
       setGameState(prevState => {
-        const targets = [...prevState.targets, [x, y] as [number, number]];
-        return { ...prevState, targets };
+        const newFlag = createFlag([x, y]);
+        return addItem(prevState, newFlag);
       });
     };
 
     const handleWallClick = (x: number, y: number) => {
       setGameState(prevState => {
-        const walls = [...prevState.walls, [x, y] as [number, number]];
-        return { ...prevState, walls };
+        const newWall = createWall([x, y]);
+        return addItem(prevState, newWall);
       });
     };
 
     const handleEmptyClick = (x: number, y: number) => {
       setGameState(prevState => {
-        const walls = prevState.walls.filter(
-          wall => wall[0] !== x || wall[1] !== y
-        );
-        const targets = prevState.targets.filter(
-          target => target[0] !== x || target[1] !== y
-        );
-        const boxes = prevState.boxes.filter(
-          box => box[0] !== x || box[1] !== y
-        );
-        const playerPosition =
-          prevState.playerPosition[0] === x && prevState.playerPosition[1] === y
-            ? ([0, 0] as [number, number])
-            : prevState.playerPosition;
-        return { ...prevState, walls, targets, boxes, playerPosition };
+        return removeItemsOnPosition(prevState, [x, y]);
       });
     };
 
@@ -112,8 +179,8 @@ export const LevelEditor: React.FC<{ onSave(): void, level?: Level }> = ({ onSav
         return handlePlayerClick(x, y);
       case "box":
         return handleBoxClick(x, y);
-      case "target":
-        return handleTargetClick(x, y);
+      case "flag":
+        return handleFlagClick(x, y);
     }
   };
 
@@ -146,10 +213,9 @@ export const LevelEditor: React.FC<{ onSave(): void, level?: Level }> = ({ onSav
   const handleSave = () => {
     if (levelName) {
       saveLevel(levelName, gameState);
-      onSave()
-    }
-    else {
-      alert('Please enter a level name')
+      onSave();
+    } else {
+      alert("Please enter a level name");
     }
   };
 

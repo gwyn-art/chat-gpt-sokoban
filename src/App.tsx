@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import Game from "./Game";
 import { Level, LevelEditor } from "./LevelEditor";
 import { LevelList } from "./LevelList";
-import { GameState } from "./types";
+import { GameState } from "./core";
 
 const App: React.FC = () => {
   const [editGameLevel, setEditGameState] = useState<Level | undefined>(undefined);
-  const [levels, setLevels] = useState<GameState[]>([]);
+  const [levels, setLevels] = useState<Level[]>([]);
   const [screen, setScreen] = useState("game");
 
   return (
@@ -24,7 +24,7 @@ const App: React.FC = () => {
       {screen === "levelList" && (
         <LevelList
           handlePlay={levels => {
-            setLevels(levels.map(level => level.level));
+            setLevels(levels);
             setScreen("game");
           }}
           handleEdit={level => {

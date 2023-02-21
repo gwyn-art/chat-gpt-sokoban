@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Direction } from "./core";
 
-export const useTouchControls = (onMove: (direction: [number, number]) => void) => {
+export const useTouchControls = (onMove: (direction: Direction) => void) => {
   const [touchStart, setTouchStart] = useState<[number, number] | null>(null);
 
   const handleTouchStart = (event: React.TouchEvent) => {
@@ -19,19 +20,19 @@ export const useTouchControls = (onMove: (direction: [number, number]) => void) 
       // horizontal swipe
       if (deltaX > 0) {
         // swipe right
-        onMove([0, 1]);
+        onMove(Direction.Right)
       } else {
         // swipe left
-        onMove([0, -1]);
+        onMove(Direction.Left)
       }
     } else {
       // vertical swipe
       if (deltaY > 0) {
         // swipe down
-        onMove([1, 0]);
+        onMove(Direction.Up)
       } else {
         // swipe up
-        onMove([-1, 0]);
+        onMove(Direction.Up);
       }
     }
 

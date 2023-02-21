@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { GameState } from "./types";
+import { Direction, GameState, isCompleted, movePlayer } from "./core";
 import { defaultLevels } from "./levels";
 import { Helper } from "./Helper";
 import { GameField } from "./GameField";
 import { useTouchControls } from "./useTouchControls";
+import { Level } from "./LevelEditor";
 
 const FIRST_LEVEL = 0;
 
 type GameProps = {
-  levels?: GameState[];
+  levels?: Level[];
   firstLevel?: number;
 };
 
@@ -16,8 +17,8 @@ const Game: React.FC<GameProps> = ({
   levels = defaultLevels,
   firstLevel = FIRST_LEVEL
 }) => {
-  const [gameState, setGameState] = useState(levels[firstLevel]);
-  const [history, setHistory] = useState<GameState[]>([levels[firstLevel]]);
+  const [gameState, setGameState] = useState(levels[firstLevel].level);
+  const [history, setHistory] = useState<GameState[]>([levels[firstLevel].level]);
   const [currentLevel, setCurrentLevel] = useState(firstLevel);
 
   const handleUndo = () => {
@@ -29,13 +30,7 @@ const Game: React.FC<GameProps> = ({
     }
   };
 
-  const isLevelCompleted = () => {
-    const boxes = gameState.boxes;
-    const targets = gameState.targets;
-    return boxes.every(box =>
-      targets.some(target => target[0] === box[0] && target[1] === box[1])
-    );
-  };
+  const isLevelCompleted = () => isCompleted(gameState);
 
   const isGameWon = () => {
     return currentLevel === levels.length - 1 && isLevelCompleted();
@@ -43,99 +38,42 @@ const Game: React.FC<GameProps> = ({
 
   const handleNextLevel = () => {
     if (isLevelCompleted() && !isGameWon()) {
-      setHistory([...history, levels[currentLevel + 1]]);
+      setHistory([...history, levels[currentLevel + 1].level]);
       setCurrentLevel(currentLevel + 1);
-      setGameState(levels[currentLevel + 1]);
+      setGameState(levels[currentLevel + 1].level);
     }
   };
 
-  const movePlayer = (direction: [number, number]) => {
-    const playerPosition = gameState.playerPosition;
-    const boxes = gameState.boxes;
-    const [x, y] = direction;
-    const newPlayerPosition = [
-      playerPosition[0] + x,
-      playerPosition[1] + y
-    ] as [number, number];
-    const newBoxes = boxes.map(box => [...box]) as [number, number][];
-    let movedBox = newBoxes.findIndex(
-      box => box[0] === newPlayerPosition[0] && box[1] === newPlayerPosition[1]
-    );
+  const makeMove = (direction: Direction) => {
+    const newGameState = movePlayer(gameState, direction)
+    setHistory([...history, newGameState]);
+    setGameState(newGameState);
+  }
 
-    while (true) {
-      if (movedBox === -1) {
-        break;
-      }
-
-      const newBoxPosition = [
-        newBoxes[movedBox][0] + x,
-        newBoxes[movedBox][1] + y
-      ] as [number, number];
-
-      if (
-        gameState.walls.some(
-          wall => wall[0] === newBoxPosition[0] && wall[1] === newBoxPosition[1]
-        )
-      ) {
-        break;
-      }
-
-      newBoxes[movedBox] = newBoxPosition;
-      movedBox = newBoxes.findIndex(
-        (box, boxIndex) =>
-          boxIndex !== movedBox &&
-          box[0] === newBoxPosition[0] &&
-          box[1] === newBoxPosition[1]
-      );
-    }
-
-    if (
-      gameState.walls.some(
-        pos =>
-          pos[0] === newPlayerPosition[0] && pos[1] === newPlayerPosition[1]
-      ) ||
-      newBoxes.some(
-        pos =>
-          pos[0] === newPlayerPosition[0] && pos[1] === newPlayerPosition[1]
-      )
-    ) {
-      return;
-    }
-
-    setGameState(prevState => {
-      setHistory([...history, prevState]);
-      return {
-        ...prevState,
-        playerPosition: newPlayerPosition,
-        boxes: newBoxes
-      };
-    });
-  };
-
-  const { handleTouchMove, handleTouchStart } = useTouchControls(movePlayer);
+  const { handleTouchMove, handleTouchStart } = useTouchControls(makeMove);
 
   function handleKeyDown(event: KeyboardEvent) {
-    let direction: [number, number] = [0, 0];
+    let direction: Direction
     switch (event.key) {
       case "ArrowUp":
-        direction = [-1, 0];
+        direction = Direction.Up;
         break;
       case "ArrowDown":
-        direction = [1, 0];
+        direction = Direction.Down;
         break;
       case "ArrowLeft":
-        direction = [0, -1];
+        direction = Direction.Left;
         break;
       case "ArrowRight":
-        direction = [0, 1];
+        direction = Direction.Right;
         break;
       case "r":
         return handlePlayAgain();
       case "n":
         if (isLevelCompleted() && !isGameWon()) {
-          setHistory([...history, levels[currentLevel + 1]]);
+          setHistory([...history, levels[currentLevel + 1].level]);
           setCurrentLevel(currentLevel + 1);
-          setGameState(levels[currentLevel + 1]);
+          setGameState(levels[currentLevel + 1].level);
         }
         return;
         break;
@@ -145,17 +83,17 @@ const Game: React.FC<GameProps> = ({
         return;
     }
 
-    movePlayer(direction);
+    makeMove(direction);
   }
 
   function handlePlayAgain() {
     if (isGameWon()) {
       setCurrentLevel(firstLevel);
-      setHistory([levels[firstLevel]]);
-      setGameState(levels[firstLevel]);
+      setHistory([levels[firstLevel].level]);
+      setGameState(levels[firstLevel].level);
     } else {
       setHistory([...history, gameState]);
-      setGameState(levels[currentLevel]);
+      setGameState(levels[currentLevel].level);
     }
   }
 

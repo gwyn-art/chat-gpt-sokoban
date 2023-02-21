@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { LEVELS_STORE_KEY, Level, loadLevels } from './LevelEditor';
+import { LEVELS_STORE_KEY, Level, loadLevels, isLevelValid } from './LevelEditor';
 
 
 type LevelListProps = {
@@ -28,6 +28,7 @@ export const LevelList: React.FC<LevelListProps> = ({ handlePlay, handleEdit }) 
       <div>
         <button
           onClick={() => handlePlay(levels)}
+          disabled={levels.length === 0 || levels.some(level => !isLevelValid(level))}
         >
           Play all
         </button>
@@ -35,7 +36,7 @@ export const LevelList: React.FC<LevelListProps> = ({ handlePlay, handleEdit }) 
         <thead>
           <tr>
             <th>Name</th>
-            <th>Author</th>
+            <th>Version</th>
             <th></th>
           </tr>
         </thead>
@@ -43,9 +44,10 @@ export const LevelList: React.FC<LevelListProps> = ({ handlePlay, handleEdit }) 
           {levels.map((level, index) => (
             <tr key={index}>
               <td>{level.name}</td>
+              <td>{level.version} {!isLevelValid(level) && 'DEPRECATED LEVEL VERSION'}</td>
               <td>
-                <button onClick={() => handlePlay([level])}>Play</button>
-                <button onClick={() => handleEdit(level)}>Edit</button>
+                <button onClick={() => handlePlay([level])} disabled={!isLevelValid(level)}>Play</button>
+                <button onClick={() => handleEdit(level)} disabled={!isLevelValid(level)}>Edit</button>
                 <button onClick={() => handleDelete(index)}>Delete</button>
               </td>
             </tr>

@@ -1,5 +1,5 @@
 import React, { TouchEventHandler } from "react";
-import { GameState } from "./types";
+import { GameState, getItemsByPosition } from "./core";
 import { Cell } from "./Cell";
 
 type GameFieldProps = {
@@ -24,26 +24,10 @@ export const GameField: React.FC<GameFieldProps> = ({
       {[...Array(gameState.height)].map((_, rowIndex) => (
         <div key={`row-${rowIndex}`} style={{ display: "flex" }}>
           {[...Array(gameState.width)].map((_, colIndex) => {
-            const isWall = gameState.walls.some(
-              wallPos => wallPos[0] === rowIndex && wallPos[1] === colIndex
-            );
-            const isPlayer =
-              gameState.playerPosition[0] === rowIndex &&
-              gameState.playerPosition[1] === colIndex;
-            const isBox = gameState.boxes.some(
-              boxPos => boxPos[0] === rowIndex && boxPos[1] === colIndex
-            );
-            const isGoal = gameState.targets.some(
-              targetPos =>
-                targetPos[0] === rowIndex && targetPos[1] === colIndex
-            );
             return (
               <Cell
                 key={`${rowIndex}-${colIndex}`}
-                isWall={isWall}
-                isPlayer={isPlayer}
-                isBox={isBox}
-                isGoal={isGoal}
+                items={getItemsByPosition(gameState, [rowIndex, colIndex])}
                 onClick={
                   onCellClick
                     ? () => onCellClick(rowIndex, colIndex)

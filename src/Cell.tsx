@@ -1,10 +1,9 @@
 import React from "react";
+import { Item, isGoal, isMovable, isPlayer, isStopper } from "./core";
+import { isTargetItem } from "./core";
 
 type CellProps = {
-  isWall?: boolean;
-  isPlayer?: boolean;
-  isBox?: boolean;
-  isGoal?: boolean;
+  items: Item[]
   onClick?: () => void;
 };
 
@@ -125,28 +124,25 @@ export const GoalIcon = (
 )
 
 export const Cell: React.FC<CellProps> = ({
-  isWall,
-  isPlayer,
-  isBox,
-  isGoal,
+  items,
   onClick
 }) => {
   let backgroundColor;
   let content;
 
-  if (isWall) {
+  if (items.some(isStopper)) {
     backgroundColor = "black";
     content = WallIcon;
-  } else if (isPlayer) {
+  } else if (items.some(isPlayer)) {
     backgroundColor = "white";
     content = PlayerIcon;
-    if (isGoal) {
+    if (items.some(isGoal)) {
       backgroundColor = "green";
     }
-  } else if (isBox) {
+  } else if (items.some(isTargetItem)) {
     // backgroundColor = "brown";
     content = BoxIcon;
-  } else if (isGoal) {
+  } else if (items.some(isGoal)) {
     backgroundColor = "green";
     content = GoalIcon;
   } else {

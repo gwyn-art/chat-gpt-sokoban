@@ -2,7 +2,6 @@ import React from "react";
 import {
   Item,
   isGoal,
-  isMovable,
   isPlayer,
   isSlippery,
   isStopper
@@ -30,19 +29,20 @@ export const Cell: React.FC<CellProps> = ({ items, onClick }) => {
 
   items.forEach(item => {
     if (isStopper(item)) {
-      backgroundColor = "black";
+      backgroundColor = "sandybrown";
       content += WallIcon;
     } else if (isPlayer(item)) {
       backgroundColor = "white";
       content += PlayerIcon;
       if (isGoal(item)) {
-        backgroundColor = "green";
+        backgroundColor = "palegoldenrod";
       }
     } else if (isTargetItem(item)) {
-      // backgroundColor = "brown";
       content += BoxIcon;
+      if (items.length === 1)
+        backgroundColor = "saddlebrown"
     } else if (isGoal(item)) {
-      backgroundColor = "green";
+      backgroundColor = "palegoldenrod";
       content += GoalIcon;
     } else if (isSlippery(item)) {
       backgroundColor = "blue";

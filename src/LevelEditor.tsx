@@ -69,7 +69,7 @@ export const createLevel = (level: LevelToCreate) => {
   };
 };
 
-export const LEVELS_STORE_KEY = "levels";
+const LEVELS_STORE_KEY = "levels";
 
 export const loadLevels = (): Level[] => {
   try {
@@ -112,6 +112,20 @@ export const saveLevel = (levelName: string, level: GameState) => {
   } catch (error) {
     // @ts-ignore
     alert(`Error while saving level: ${error.message}`);
+  }
+};
+
+export const deleteLevel = (index: number) => {
+  try {
+    const levels = JSON.parse(
+      localStorage.getItem(LEVELS_STORE_KEY) || "[]"
+    ) as PersistLevel[];
+    const newLevels = levels.filter((level, i) => i !== index);
+    localStorage.setItem("levels", JSON.stringify(newLevels));
+    return loadLevels()
+  } catch (error) {
+    // @ts-ignore
+    alert(`Error while deleting level: ${error.message}`);
   }
 };
 

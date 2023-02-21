@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { LEVELS_STORE_KEY, Level, loadLevels, isLevelValid } from './LevelEditor';
+import { Level, loadLevels, isLevelValid, deleteLevel } from './LevelEditor';
 
 
 type LevelListProps = {
@@ -18,10 +18,8 @@ export const LevelList: React.FC<LevelListProps> = ({ handlePlay, handleEdit }) 
     }, []);
   
     const handleDelete = (index: number) => {
-      const newLevels = [...levels];
-      newLevels.splice(index, 1);
-      localStorage.setItem(LEVELS_STORE_KEY, JSON.stringify(newLevels));
-      setLevels(newLevels);
+      const newLevels = deleteLevel(index)
+      setLevels(newLevels || []);
     };
   
     return (

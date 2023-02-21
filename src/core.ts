@@ -26,6 +26,10 @@ export enum PropertyType {
 
 export type Position = [number, number];
 
+export const comparePosition = (a: Position, b: Position): boolean => {
+  return a[0] === b[0] && a[1] === b[1];
+};
+
 export enum Direction {
   Up = "up",
   Down = "down",
@@ -422,6 +426,7 @@ const moveSinglePlayer = (
   }
 };
 
+
 /**
  * Checks if the game is completed by checking if all goals are filled with target items.
  * @param state
@@ -429,5 +434,5 @@ const moveSinglePlayer = (
 export const isCompleted = (state: GameState): boolean => {
   const goals = getItemsByPropertyType(state, PropertyType.Goal);
   const targets = getItemsByPropertyType(state, PropertyType.TargetItem);
-  return goals.every(g => targets.some(t => t.position === g.position));
+  return goals.every(g => targets.some(t => comparePosition(t.position, g.position)));
 };

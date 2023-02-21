@@ -4,6 +4,7 @@ import {
   PersistedGameState,
   addItem,
   createBox,
+  createFire,
   createFlag,
   createIce,
   createItems,
@@ -11,7 +12,7 @@ import {
   createWall,
   removeItem,
   removeItemsOnPosition
-} from "./core";
+} from "./core/core";
 import { GameField } from "./GameField";
 import SquareTypeSelector, { SquareType } from "./SquareTypeSelector";
 
@@ -188,6 +189,13 @@ export const LevelEditor: React.FC<{ onSave(): void; level?: Level }> = ({
       });
     }
 
+    const handleFireClick = (x: number, y: number) => {
+      setGameState(prevState => {
+        const newFire = createFire([x, y]);
+        return addItem(prevState, newFire);
+      });
+    }
+    
     switch (selectedType) {
       case "empty":
         return handleEmptyClick(x, y);
@@ -201,6 +209,8 @@ export const LevelEditor: React.FC<{ onSave(): void; level?: Level }> = ({
         return handleFlagClick(x, y);
       case "ice":
         return handleIceClick(x, y);
+      case "fire":
+        return handleFireClick(x, y);
     }
   };
 

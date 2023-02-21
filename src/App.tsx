@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Game from "./Game";
 import { Level, LevelEditor } from "./LevelEditor";
 import { LevelList } from "./LevelList";
-import { GameState } from "./core";
+import { GameState } from "./core/core";
 
 const App: React.FC = () => {
   const [editGameLevel, setEditGameState] = useState<Level | undefined>(undefined);

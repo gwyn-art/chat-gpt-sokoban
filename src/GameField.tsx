@@ -1,5 +1,5 @@
 import React, { TouchEventHandler } from "react";
-import { GameState, getItemsByPosition } from "./core";
+import { GameState, getItemsByPosition } from "./core/core";
 import { Cell } from "./Cell";
 
 type GameFieldProps = {

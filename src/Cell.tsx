@@ -2,11 +2,12 @@ import React from "react";
 import {
   Item,
   isGoal,
+  isInflammable,
   isPlayer,
   isSlippery,
   isStopper
-} from "./core";
-import { isTargetItem } from "./core";
+} from "./core/core";
+import { isTargetItem } from "./core/core";
 
 type CellProps = {
   items: Item[];
@@ -22,6 +23,8 @@ export const BoxIcon = "📦";
 export const GoalIcon = "🚩";
 
 export const IceIcon = "🧊";
+
+export const FireIcon = "🔥";
 
 export const Cell: React.FC<CellProps> = ({ items, onClick }) => {
   let backgroundColor;
@@ -47,6 +50,9 @@ export const Cell: React.FC<CellProps> = ({ items, onClick }) => {
     } else if (isSlippery(item)) {
       backgroundColor = "blue";
       content += IceIcon;
+    } else if (isInflammable(item)) {
+      backgroundColor = "red";
+      content += FireIcon;
     }
   });
 

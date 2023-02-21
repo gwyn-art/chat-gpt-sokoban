@@ -1,5 +1,5 @@
 import { Level, createLevel } from "./LevelEditor";
-import { GameState, createItems } from "./core";
+import { GameState, createItems } from "./core/core";
 
 const levels = [
   {

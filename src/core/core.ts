@@ -21,7 +21,10 @@ export enum PropertyType {
   // Items that where a TargetItems should be placed to finish the level
   Goal = "goal",
   // If item is moved onto a slippery item, it will slide to the next position
-  Slippery = "slippery"
+  Slippery = "slippery",
+  // If flammable item is moved onto a inflammable item, it will be destroyed 
+  Inflammable = "inflammable",
+  Flammable = "flammable",
 }
 
 export type Position = [number, number];
@@ -149,6 +152,12 @@ export const isGoal = (item: Item): boolean =>
 export const isSlippery = (item: Item): boolean =>
   hasProperty(item, createProperty(PropertyType.Slippery));
 
+export const isFlammable = (item: Item): boolean => 
+  hasProperty(item, createProperty(PropertyType.Flammable));
+
+export const isInflammable = (item: Item): boolean =>
+  hasProperty(item, createProperty(PropertyType.Inflammable));
+
 export const changeFacing = (item: Item, facing: Facing): Item => ({
   ...item,
   facing
@@ -176,6 +185,7 @@ export const createBox = (position: Position): Item =>
     properties: [
       createProperty(PropertyType.Movable),
       createProperty(PropertyType.TargetItem),
+      createProperty(PropertyType.Flammable),
       createProperty(PropertyType.Pusher)
     ]
   });
@@ -190,6 +200,12 @@ export const createIce = (position: Position): Item =>
   createItem({
     position,
     properties: [createProperty(PropertyType.Slippery)]
+  });
+
+export const createFire = (position: Position): Item => 
+  createItem({
+    position,
+    properties: [createProperty(PropertyType.Inflammable)]
   });
 
 // --- Game State ---
@@ -243,6 +259,17 @@ export const removeItemsOnPosition = (
 };
 
 export const updateItem = (state: GameState, item: Item): GameState => {
+  console.log("🚀 ~ file: core.ts:261 ~ updateItem ~ item", item)
+  console.log("🚀 ~ file: core.ts:262 ~ updateItem ~ isFlammable(item)", isFlammable(item))
+  if (isFlammable(item)) {
+    const itemsOnPosition = getItemsByPosition(state, item.position);
+    const isOnFire = itemsOnPosition.some(i => isInflammable(i));
+    console.log("🚀 ~ file: core.ts:266 ~ updateItem ~ isOnFire", isOnFire)
+    if (isOnFire) {
+      return removeItem(state, item);
+    }
+  }
+
   const items = new Map(state.items);
   items.set(item.id, item);
   return {

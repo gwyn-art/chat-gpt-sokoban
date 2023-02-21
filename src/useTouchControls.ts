@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Direction } from "./core";
+import { Direction } from "./core/core";
 
 export const useTouchControls = (onMove: (direction: Direction) => void) => {
   const [touchStart, setTouchStart] = useState<[number, number] | null>(null);

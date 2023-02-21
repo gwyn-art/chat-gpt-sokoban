@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Direction, GameState, isCompleted, movePlayer } from "./core";
+import { Direction, GameState, isCompleted, movePlayer } from "./core/core";
 import { defaultLevels } from "./levels";
 import { Helper } from "./Helper";
 import { GameField } from "./GameField";

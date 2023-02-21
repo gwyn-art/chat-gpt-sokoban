@@ -5,6 +5,7 @@ import {
   addItem,
   createBox,
   createFlag,
+  createIce,
   createItems,
   createPlayer,
   createWall,
@@ -130,10 +131,6 @@ export const LevelEditor: React.FC<{ onSave(): void; level?: Level }> = ({
   const [levelName, setLevelName] = useState(level.name);
   const [selectedType, setSelectedType] = useState<SquareType>("empty");
   const [gameState, setGameState] = useState<GameState>(level.level);
-  console.log(
-    "🚀 ~ file: LevelEditor.tsx:113 ~ constLevelEditor:React.FC<{onSave ~ gameState",
-    gameState
-  );
 
   const handleSquareClick = (x: number, y: number) => {
     const handlePlayerClick = (x: number, y: number) => {
@@ -170,6 +167,13 @@ export const LevelEditor: React.FC<{ onSave(): void; level?: Level }> = ({
       });
     };
 
+    const handleIceClick = (x: number, y: number) => {
+      setGameState(prevState => {
+        const newIce = createIce([x, y]);
+        return addItem(prevState, newIce);
+      });
+    }
+
     switch (selectedType) {
       case "empty":
         return handleEmptyClick(x, y);
@@ -181,6 +185,8 @@ export const LevelEditor: React.FC<{ onSave(): void; level?: Level }> = ({
         return handleBoxClick(x, y);
       case "flag":
         return handleFlagClick(x, y);
+      case "ice":
+        return handleIceClick(x, y);
     }
   };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Item, isGoal, isMovable, isPlayer, isStopper } from "./core";
+import { Item, isGoal, isMovable, isPlayer, isSlippery, isStopper } from "./core";
 import { isTargetItem } from "./core";
 
 type CellProps = {
@@ -145,6 +145,9 @@ export const Cell: React.FC<CellProps> = ({
   } else if (items.some(isGoal)) {
     backgroundColor = "green";
     content = GoalIcon;
+  } else if (items.some(isSlippery)) {
+    backgroundColor = "blue";
+    content = "🧊"
   } else {
     backgroundColor = "white";
     content = (

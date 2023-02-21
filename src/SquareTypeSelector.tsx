@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import './SquareTypeSelector.css'
 
-export type SquareType = "empty" | "wall" | "flag" | "box" | "player";
+export type SquareType = "empty" | "wall" | "flag" | "box" | "player" | "ice";
 
 type SquareTypeSelectorProps = {
   onSelectType: (type: SquareType) => void;
@@ -43,6 +43,12 @@ const SquareTypeSelector: React.FC<SquareTypeSelectorProps> = ({
         onClick={() => handleButtonClick("box")}
       >
         Box
+      </button>
+      <button
+        className={selectedType === "ice" ? "selected" : ""}
+        onClick={() => handleButtonClick("ice")}
+      >
+        Ice
       </button>
       <button
         className={selectedType === "player" ? "selected" : ""}

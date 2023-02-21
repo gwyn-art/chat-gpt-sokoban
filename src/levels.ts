@@ -788,13 +788,16 @@ const levels = [
 
 
 // @ts-ignore
-export const defaultLevels: Level[] = levels.map((level) => {
+export const defaultLevels: Level[] = levels.map(({ level, ...other }) => {
   return {
-    ...level.level,
-    // @ts-ignore
-    items: createItems(level.level.items).reduce(
-      (items, item) => items.set(item.id, item),
-      new Map()
-    )
+    ...other,
+    level: {
+      ...level,
+      // @ts-ignore
+      items: createItems(level.items).reduce(
+        (items, item) => items.set(item.id, item),
+        new Map()
+      )
+    }
   };
 })
